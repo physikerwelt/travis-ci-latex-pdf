@@ -44,6 +44,10 @@
 \usepackage{algorithm} % Algorithm environment
 \usepackage[noend]{algpseudocode} % Layout for algorithmicx package
 \usepackage{chngcntr} % Customise table/figure counters
+\usepackage[
+  citations=true,
+  hybrid=true
+]{markdown} %Use Markdown
 
 % Copy of local file C:/Program Files/SageMath 8.1/runtime/opt/sagemath-8.1/local/share/texmf/tex/latex/sagetex/sagetex.sty
 % Not per se machine-independent.
@@ -83,6 +87,9 @@
     \end{sagesilent}
 
     Hidden message in $\sage{mod(h^-1 * cipher, p)}$.
+\begin{markdown}
+Here are some non-ASCII characters: *ěščřžýáíé*.
+\end{markdown}
 
 
     \bibliography{books}
