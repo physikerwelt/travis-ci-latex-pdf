@@ -1,48 +1,23 @@
-notifications:
-  email: false
-
-before_install:
-  # Install makeindex, if you do not use an index you can remove this (also remove the extra makeindex call).
-  - sudo apt-get install texlive-binaries
-
 install:
-  # Silent install from conda docs
-  # https://conda.io/docs/user-guide/install/macos.html#install-macos-silent
-  # adapted using
-  # https://conda.io/docs/user-guide/tasks/use-conda-with-travis-ci.html
-
-  # Needed to check if conda already installed
-  - export PATH="$HOME/miniconda/bin:$PATH"
-
-  # If not yet installed, obtain Miniconda
-  # and tectonic
-  # From tectonic docs
-  # https://tectonic-typesetting.github.io/en-US/install.html#the-anaconda-method
-  - if ! command -v conda > /dev/null; then
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      bash miniconda.sh -b -p $HOME/miniconda -u;
-      conda config --add channels conda-forge;
-      conda config --set always_yes yes;
-      conda update --all;
-      conda install tectonic;
-    fi
-  - conda info -a
+ - source ./texlive_install.sh
 cache:
   directories:
-    - $HOME/miniconda
-    - $HOME/.cache/Tectonic
-script: # Change working directory each time so including files will work. Change back so the pdfs can be found for deployment. This way, building multiple files goes well.
- - cd ./src/
- # Tectonic does not include makeindex, so that needs to be done manually.
- - tectonic ./main.tex
- - makeindex ./main.idx
- - tectonic ./main.tex --print
- - cd ../
+    - /tmp/texlive
+    - $HOME/.texlive
+# Change working directory so including files will work
+before_script: cd ./src/
+script:
+- mkdir _build
+# Prefix command with travis_wait x so it times out after 3 mins, because when the LaTeX doesn't compile pdflatex just hangs instead of quitting.
+- travis_wait 3 pdflatex -output-directory _build ./main.tex
+# Compile twice to fix possible references
+- travis_wait 3 pdflatex -output-directory _build ./main.tex
 deploy:
   provider: releases
-  file:
-  - ./src/main.pdf
-  skip_cleanup: true
+  api_key:
+    secure: F2SewLZpiQp4Ksl1JPoBCUZYs/rv5SYM3kZKjDvBYGCzDOoVoK/0oUX7TA3t/L9LjNxk9nymupv4DMq+u31jylROdSZZQNm1wZrg6meNXqasZpN/emXmxMU/k2rdNy3ZQcT08qljj/3Sg778OcVPkzrAQGSHwKbQNMlAnUXGhYY0T8cFj2nU3VkW9LKBjKc6cTh3WsZRGQKttj2jDKsc1t7GbmfSaxnvNq/U0gJ+jx2vbNqaNvaTdFsRi8mkN8i1Z9D2+M/LSZgzBKnkiHG58tSO2wrnyqp1G46+0vvL7zYvK1Nsks02NN4LvYz8SDu5jisAFZHQgcd3LVZubxj3hBLovUSgG6hga1EkgS5EIIKMU3mCM7G4j1smTcQxgLTYtf5v5FoHNdGh3xQQ9SwdYL+fIqIrxm24+VvaJu1MEoIhK4KBsLUP1cuzfcbsymN284KRxJ/s5OYqh4JTTPFMQVyrtqpRjh/WDuTAo7/5DoZIv6kXFYFyNL6N4pC3Su7E+tJDCR+FZMDwnZ4mKMk7nbG1uhfqmpksJgQsgpAyU+kZkX7NfHXxSvhLRLiRMjYk0cvmmM1eMLIdf/3rfrJqWHwAQWx6f4oPRrdHMrth3obk/+fDsyPS8j4MPu6aAl7rXtqVc67f8hndjQXpWXXOLDSOpu2QI3BEd7sCxGHLm3Y=
+  file: src/main.pdf
   on:
     tags: true
     branch: master
+    repo: physikerwelt/travis-ci-latex-pdf
