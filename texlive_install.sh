@@ -79,6 +79,7 @@ tlmgr install   \
   chngcntr      \
   imakeidx      \
   csvsimple     \
+  paralist      \
   markdown
 
 # Keep no backups (not required, simply makes cache bigger)
