@@ -78,6 +78,7 @@ tlmgr install   \
   multirow      \
   chngcntr      \
   imakeidx      \
+  csvsimple     \
   markdown
 
 # Keep no backups (not required, simply makes cache bigger)
